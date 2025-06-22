@@ -31,3 +31,31 @@ mongoose
 app.get("/", (req, res) => {
   res.send("🚀 Backend is up and running!");
 });
+
+app.post("/api/request", async (req, res) => {
+  const { url, method, headers, body } = req.body;
+  try {
+    const response = await fetch(url, {
+      method,
+      headers,
+      body:
+        method !== "GET" && method !== "HEAD"
+          ? JSON.stringify(body)
+          : undefined,
+    });
+    const data = await response.json();
+
+    res.json({
+      status: response.status,
+      statusText: response.statusText,
+      headers: response.headers,
+      body: data,
+    });
+  } catch (err) {
+    const error = err as Error;
+    res.status(500).json({
+      error: "request failed",
+      details: error.message,
+    });
+  }
+});
