@@ -22,11 +22,14 @@ const Statistics: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/stats", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://postman-clone-ci4y.onrender.com/api/stats",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.ok) {
         const data = await response.json();

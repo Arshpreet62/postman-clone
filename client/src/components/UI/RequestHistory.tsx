@@ -52,7 +52,7 @@ const RequestHistory: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:5000/api/history?page=${page}&limit=10`,
+        `https://postman-clone-ci4y.onrender.com/api/history?page=${page}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,7 +78,7 @@ const RequestHistory: React.FC = () => {
     if (!token) return;
     try {
       const response = await fetch(
-        `http://localhost:5000/api/history/${requestId}`,
+        `https://postman-clone-ci4y.onrender.com/api/history/${requestId}`,
         {
           method: "DELETE",
           headers: {
@@ -103,12 +103,15 @@ const RequestHistory: React.FC = () => {
     if (!confirm("Are you sure you want to clear all request history?")) return;
 
     try {
-      const response = await fetch("http://localhost:5000/api/history", {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        "https://postman-clone-ci4y.onrender.com/api/history",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       if (response.ok) {
         setHistory([]);
         setPagination(null);

@@ -45,19 +45,22 @@ export default function Form() {
     console.log(finalHeaders);
 
     try {
-      const response = await fetch("http://localhost:5000/api/request", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          url,
-          method,
-          headers: finalHeaders,
-          body,
-        }),
-      });
+      const response = await fetch(
+        "https://postman-clone-ci4y.onrender.com/api/request",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            url,
+            method,
+            headers: finalHeaders,
+            body,
+          }),
+        }
+      );
 
       const result = await response.json();
 

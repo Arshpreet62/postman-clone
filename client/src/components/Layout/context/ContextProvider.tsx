@@ -31,9 +31,12 @@ export const ContextProvider = ({ children }: Props) => {
 
   const fetchUser = async (token: string) => {
     try {
-      const res = await fetch("http://localhost:5000/api/auth/profile", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        "https://postman-clone-ci4y.onrender.com/api/auth/profile",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       const data = await res.json();
       if (res.ok) {
         setUser(data.user);
@@ -48,11 +51,14 @@ export const ContextProvider = ({ children }: Props) => {
   };
 
   const login = async (email: string, password: string) => {
-    const res = await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const res = await fetch(
+      "https://postman-clone-ci4y.onrender.com/api/auth/login",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Login failed");
 
@@ -63,11 +69,14 @@ export const ContextProvider = ({ children }: Props) => {
   };
 
   const signup = async (email: string, password: string) => {
-    const res = await fetch("http://localhost:5000/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    const res = await fetch(
+      "https://postman-clone-ci4y.onrender.com/api/auth/signup",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      }
+    );
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Signup failed");
 
