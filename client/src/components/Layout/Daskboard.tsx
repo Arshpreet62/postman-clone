@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGlobal } from "./context/Context";
 import { Link, useLocation } from "wouter";
 import RequestForm from "../UI/Form";
@@ -12,7 +12,6 @@ const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"request" | "history" | "stats">(
     "request"
   );
-
   useEffect(() => {}, []);
 
   const handleLogout = async () => {
@@ -25,7 +24,7 @@ const Dashboard: React.FC = () => {
       localStorage.removeItem("user");
 
       // Navigate to landing page
-      navigate("/"); // or navigate('/login') depending on your route structure
+      navigate("/");
     } catch (error) {
       console.error("Logout failed:", error);
       // Even if logout fails, redirect to landing page
