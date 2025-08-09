@@ -8,7 +8,7 @@ import ResponseShowcase from "../UI/ResponseDisplay";
 
 const Dashboard: React.FC = () => {
   const { user, logout, responseData, setResponseData } = useGlobal();
-  const [location, navigate] = useLocation();
+  const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<"request" | "history" | "stats">(
     "request"
   );

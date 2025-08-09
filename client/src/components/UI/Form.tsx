@@ -6,7 +6,7 @@ export default function Form() {
     key: string;
     value: string;
   };
-  const { setResponseData, token, user } = useGlobal();
+  const { setResponseData, token } = useGlobal();
   const [url, setUrl] = useState("");
   const [method, setMethod] = useState("GET");
   const [headers, setHeaders] = useState<Header[]>([]);

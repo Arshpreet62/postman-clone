@@ -1,4 +1,3 @@
-
 import "./App.css";
 import Landing from "./components/Layout/Landing";
 import { Route } from "wouter";
