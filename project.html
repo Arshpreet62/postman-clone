@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1 id="title">Feedback Form</h1>
+    <p id="description">
+      Please fill out the form below to provide feedback on the project.
+    </p>
+    <form id="survey-form">
+      <label id="name-label" for="name">Name:</label>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        placeholder="Your Name"
+        required
+      />
+      <label id="email-label" for="email">Email:</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        placeholder="Your Email"
+        required
+      />
+      <label id="number-label" for="Age">Age:</label>
+      <input
+        type="number"
+        id="number"
+        name="Age"
+        max="60"
+        min="13"
+        placeholder="Your Age"
+        required
+      />
+      <label id="gender-label" for="gender">Gender:</label>
+      <select name="gender" id="dropdown">
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <fieldset>
+        <legend>Employment Type</legend>
+        <label for="employee">Employee</label>
+        <input type="radio" id="employee" name="employee" value="Employee" />
+        <label for="contractor">Contractor</label>
+        <input
+          type="radio"
+          id="contractor"
+          name="employee"
+          value="Contractor"
+        />
+        <label for="intern">Intern</label>
+        <input type="radio" id="intern" name="employee" value="Intern" />
+      </fieldset>
+
+      <label for="intrest">Interest:</label>
+      <label for="tech">Tech:</label>
+      <input type="checkbox" id="tech" name="tech" value="tech" />
+      <label for="design">Design:</label>
+      <input type="checkbox" id="design" name="design" value="design" />
+      <label for="marketing">Marketing:</label>
+      <input
+        type="checkbox"
+        id="marketing"
+        name="marketing"
+        value="marketing"
+      />
+
+      <label for="message">Message:</label>
+      <textarea id="message" name="message" required></textarea>
+      <button id="submit" type="submit">Submit</button>
+    </form>
+  </body>
+</html>
