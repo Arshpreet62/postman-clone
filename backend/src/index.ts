@@ -17,13 +17,13 @@ app.use(
     credentials: true,
   })
 );
-app.options(
-  "*",
-  cors({
-    origin: ["https://postman-clone-git-main-arshpreet62s-projects.vercel.app"],
-    credentials: true,
-  })
-);
+// app.options(
+//   "*",
+//   cors({
+//     origin: ["https://postman-clone-git-main-arshpreet62s-projects.vercel.app"],
+//     credentials: true,
+//   })
+// );
 
 app.use(express.json());
 
