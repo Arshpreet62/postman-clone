@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://postman-clone-ci4y.onrender.com/"],
+    origin: ["https://postman-clone-ci4y.onrender.com"],
     credentials: true,
   })
 );
