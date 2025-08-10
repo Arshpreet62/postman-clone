@@ -11,20 +11,25 @@ import { authenticateJWT } from "./authMiddleware";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://postman-clone-git-main-arshpreet62s-projects.vercel.app",
+];
+
 app.use(
   cors({
-    origin: ["https://postman-clone-git-main-arshpreet62s-projects.vercel.app"],
-    credentials: true,
-  })
-);
-app.options(
-  "*",
-  cors({
-    origin: ["https://postman-clone-git-main-arshpreet62s-projects.vercel.app"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
+app.options("*", cors());
 app.use(express.json());
 
 mongoose
