@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://postman-clone-seven.vercel.app/"],
+    origin: ["https://postman-clone-seven.vercel.app"],
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
