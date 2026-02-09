@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import ResponseShowcase from "./ResponseDisplay";
+import config from "../../config/config";
 
 interface RequestHistoryItem {
   _id: string; // MongoDB document ID as a string
@@ -29,7 +30,7 @@ interface Pagination {
 
 // Helper to normalize headers: convert string[] to comma-joined strings
 const normalizeHeaders = (
-  headers: Record<string, string | string[]>
+  headers: Record<string, string | string[]>,
 ): Record<string, string> => {
   const normalized: Record<string, string> = {};
   Object.entries(headers).forEach(([key, value]) => {
@@ -52,12 +53,12 @@ const RequestHistory: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://postman-clone-ci4y.onrender.com/api/history?page=${page}&limit=10`,
+        `${config.API_URL}/api/history?page=${page}&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -78,13 +79,13 @@ const RequestHistory: React.FC = () => {
     if (!token) return;
     try {
       const response = await fetch(
-        `https://postman-clone-ci4y.onrender.com/api/history/${requestId}`,
+        `${config.API_URL}/api/history/${requestId}`,
         {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
       if (response.ok) {
         // Refresh current page after deletion
@@ -103,15 +104,12 @@ const RequestHistory: React.FC = () => {
     if (!confirm("Are you sure you want to clear all request history?")) return;
 
     try {
-      const response = await fetch(
-        "https://postman-clone-ci4y.onrender.com/api/history",
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${config.API_URL}/api/history`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
         setHistory([]);
         setPagination(null);
@@ -193,7 +191,7 @@ const RequestHistory: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <span
                     className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getMethodColor(
-                      req.method
+                      req.method,
                     )}`}
                   >
                     {req.method}
@@ -210,7 +208,7 @@ const RequestHistory: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <span
                     className={`text-sm font-medium ${getStatusColor(
-                      req.response.status
+                      req.response.status,
                     )}`}
                   >
                     {req.response.status}

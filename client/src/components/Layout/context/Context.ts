@@ -10,15 +10,16 @@ export type ResponseData = {
     url: string;
     method: string;
     headers: Record<string, string>;
-    body: string;
+    body?: any;
   };
   response: {
     status: number;
     statusText: string;
     headers: Record<string, string>;
-    body: any;
+    body?: any;
   };
   savedToHistory?: boolean;
+  duration?: number;
 };
 
 export interface ContextType {

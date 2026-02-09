@@ -10,7 +10,7 @@ const Dashboard: React.FC = () => {
   const { user, logout, responseData, setResponseData } = useGlobal();
   const [, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<"request" | "history" | "stats">(
-    "request"
+    "request",
   );
   useEffect(() => {}, []);
 
@@ -123,7 +123,7 @@ const Dashboard: React.FC = () => {
             ) : (
               <div className="text-center flex gap-4 items-center pt-10 flex-col">
                 <h3 className="text-3xl font-bold">You need to login</h3>
-                <Link to="/login">
+                <Link href="/login">
                   <button className="bg-blue-500 px-4 py-2 rounded-md text-xl font-bold text-white">
                     Login
                   </button>
@@ -136,7 +136,7 @@ const Dashboard: React.FC = () => {
             ) : (
               <div className="text-center flex gap-4 items-center pt-10 flex-col">
                 <h3 className="text-3xl font-bold">You need to login</h3>
-                <Link to="/login">
+                <Link href="/login">
                   <button className="bg-blue-500 px-4 py-2 rounded-md text-xl font-bold text-white">
                     Login
                   </button>

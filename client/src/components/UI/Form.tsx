@@ -1,12 +1,17 @@
 import React, { useState } from "react";
 import { useGlobal } from "../Layout/context/Context";
+import { useToast } from "./Toast";
+import { apiService } from "../../services/api";
 
 export default function Form() {
   type Header = {
     key: string;
     value: string;
   };
+
   const { setResponseData, token } = useGlobal();
+  const { showToast } = useToast();
+
   const [url, setUrl] = useState("");
   const [method, setMethod] = useState("GET");
   const [headers, setHeaders] = useState<Header[]>([]);
@@ -14,104 +19,109 @@ export default function Form() {
   const [headersKey, setHeadersKey] = useState("");
   const [headersValue, setHeadersValue] = useState("");
   const [urlerror, setUrlerror] = useState("");
-  const [requestError, setRequestError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const addMoreHeaders = () => {
+    if (!headersKey.trim() || !headersValue.trim()) {
+      showToast("Both key and value are required", "warning");
+      return;
+    }
     setHeaders([...headers, { key: headersKey, value: headersValue }]);
     setHeadersKey("");
     setHeadersValue("");
+    showToast("Header added", "success");
+  };
+
+  const removeHeader = (index: number) => {
+    setHeaders(headers.filter((_, i) => i !== index));
+    showToast("Header removed", "info");
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Validate URL
     try {
       new URL(url);
       setUrlerror("");
     } catch {
       setUrlerror("Invalid URL");
+      showToast("Invalid URL format", "error");
       return;
     }
+
+    setIsLoading(true);
+
+    if (!token) {
+      showToast("Login to save request history", "info");
+    }
+
     const finalHeaders = [...headers];
     const trimmedkey = headersKey.trim();
     const trimmedValue = headersValue.trim();
+
     if (trimmedkey && trimmedValue) {
       finalHeaders.push({ key: trimmedkey, value: trimmedValue });
     }
 
-    const check = finalHeaders.some((header) => header.key === "Content-Type");
-
-    if (!check && method !== "GET") {
-      finalHeaders.push({ key: "Content-Type", value: "application/json" });
-    }
-    console.log(finalHeaders);
-
     try {
-      const response = await fetch(
-        "https://postman-clone-ci4y.onrender.com/api/request",
+      const result = await apiService.post<any>(
+        "/api/request",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            url,
-            method,
-            headers: finalHeaders,
-            body,
-          }),
-        }
+          url,
+          method,
+          headers: finalHeaders,
+          body: method !== "GET" && body ? JSON.parse(body) : undefined,
+        },
+        token ? { Authorization: `Bearer ${token}` } : undefined,
       );
 
-      const result = await response.json();
-
       setResponseData({
-        request: {
-          url: result.request.url,
-          method: result.request.method,
-          headers: result.request.headers,
-          body: result.request.body,
-        },
-        response: {
-          status: result.response.status,
-          statusText: result.response.statusText,
-          headers: result.response.headers,
-          body: result.response.body,
-        },
+        request: result.request,
+        response: result.response,
         savedToHistory: result.savedToHistory,
+        duration: result.duration,
       });
+
+      showToast(
+        `Request successful (${result.duration}ms)${
+          result.savedToHistory ? " - Saved to history" : ""
+        }`,
+        "success",
+      );
+
+      // Clear form
       setHeaders([]);
       setHeadersKey("");
       setHeadersValue("");
       setUrl("");
       setMethod("GET");
       setBody("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Request failed:", error);
-      setRequestError("Failed to send request. Please try again.");
+      showToast(error.message || "Failed to send request", "error");
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <form
       className="flex w-100 justify-center items-center bg-white shadow-lg p-4 rounded-lg"
       onSubmit={handleSubmit}
     >
-      <div className="flex  flex-col gap-3 rounded-md justify-center border-2 border-black/30  h-full w-full px-3 py-2 relative">
-        {requestError.length > 0 && (
-          <div className="flex w-full h-full flex-col gap-3 items-center justify-center absolute top-0 right-0 bg-white z-10">
-            <p className="text-center font-medium text-red-500 text-3xl">
-              {requestError}
+      <div className="flex flex-col gap-3 rounded-md justify-center border-2 border-black/30 h-full w-full px-3 py-2 relative">
+        {isLoading && (
+          <div className="flex w-full h-full flex-col gap-3 items-center justify-center absolute top-0 right-0 bg-white/90 z-10">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <p className="text-center font-medium text-blue-500 text-xl">
+              Sending request...
             </p>
-            <button
-              type="button"
-              className="px-2 py-1 rounded-md bg-blue-500/90 text-xl font-bold text-white"
-              onClick={() => setRequestError("")}
-            >
-              Clear
-            </button>
           </div>
         )}
-        <div className="flex  gap-1 justify-between items-center w-full">
-          <h3 className=" flex items-center gap-2 text-nowrap text-xl font-bold text-blue-600/90">
+
+        <div className="flex gap-1 justify-between items-center w-full">
+          <h3 className="flex items-center gap-2 text-nowrap text-xl font-bold text-blue-600/90">
             URL
             <span>
               <svg
@@ -133,13 +143,15 @@ export default function Form() {
           <input
             type="text"
             value={url}
-            className="w-60 rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-60 rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="enter your url"
             onChange={(e) => setUrl(e.target.value)}
+            disabled={isLoading}
           />
         </div>
 
         {urlerror.length > 0 && <p className="text-red-500">{urlerror}</p>}
+
         <div className="flex gap-2 items-center justify-between w-full">
           <h3 className="text-nowrap text-xl font-bold text-blue-600/90">
             Method
@@ -148,13 +160,15 @@ export default function Form() {
             name="method"
             id="method"
             value={method}
-            className="px-2 py-2 w-60 border-2  border-black/30 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2 py-2 w-60 border-2 border-black/30 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setMethod(e.target.value)}
+            disabled={isLoading}
           >
             <option value="GET">GET</option>
             <option value="POST">POST</option>
             <option value="PUT">PUT</option>
             <option value="DELETE">DELETE</option>
+            <option value="PATCH">PATCH</option>
           </select>
         </div>
 
@@ -168,22 +182,24 @@ export default function Form() {
                 type="text"
                 placeholder="key"
                 value={headersKey}
-                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={(e) => setHeadersKey(e.target.value)}
+                disabled={isLoading}
               />
               <input
                 type="text"
                 placeholder="value"
                 value={headersValue}
-                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={(e) => setHeadersValue(e.target.value)}
+                disabled={isLoading}
               />
             </div>
             <button
-              className="px-2 py-1 rounded-md bg-blue-500/90 hover:bg-blue-600/90 text-xl font-bold text-white"
+              className="px-2 py-1 rounded-md bg-blue-500/90 hover:bg-blue-600/90 text-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed"
               type="button"
               onClick={addMoreHeaders}
-              disabled={!headersKey || !headersValue}
+              disabled={!headersKey || !headersValue || isLoading}
             >
               ADD MORE
             </button>
@@ -193,7 +209,6 @@ export default function Form() {
                   key={index}
                   className="flex w-full h-10 items-center justify-between gap-2"
                 >
-                  {/* Header Key */}
                   <div
                     className="w-[35%] h-full flex items-center px-2 text-start border-2 border-black/30 rounded-md overflow-x-auto whitespace-nowrap hide-scrollbar"
                     title={header.key}
@@ -201,10 +216,8 @@ export default function Form() {
                     {header.key}
                   </div>
 
-                  {/* Colon */}
                   <span className="text-xl">:</span>
 
-                  {/* Header Value */}
                   <div
                     className="w-[35%] h-full flex items-center px-2 text-start border-2 border-black/30 rounded-md overflow-x-auto whitespace-nowrap hide-scrollbar"
                     title={header.value}
@@ -212,13 +225,11 @@ export default function Form() {
                     {header.value}
                   </div>
 
-                  {/* Delete Button */}
                   <button
                     type="button"
-                    className="px-3 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white font-semibold transition"
-                    onClick={() =>
-                      setHeaders(headers.filter((_, i) => i !== index))
-                    }
+                    className="px-3 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white font-semibold transition disabled:opacity-50"
+                    onClick={() => removeHeader(index)}
+                    disabled={isLoading}
                   >
                     Delete
                   </button>
@@ -226,21 +237,23 @@ export default function Form() {
               ))}
             </ul>
             <h3 className="text-xl text-center font-medium text-black/75">
-              Body
+              Body (JSON)
             </h3>
             <textarea
-              placeholder="enter your body"
-              className="w-full h-40  rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder='{"key": "value"}'
+              className="w-full h-40 rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
               value={body}
               onChange={(e) => setBody(e.target.value)}
+              disabled={isLoading}
             />
           </>
         )}
         <button
-          className="px-2 py-1 rounded-md bg-blue-500/90 hover:bg-blue-600/90 text-xl font-bold text-white"
+          className="px-4 py-2 rounded-md bg-blue-500/90 hover:bg-blue-600/90 text-xl font-bold text-white disabled:opacity-50 disabled:cursor-not-allowed transition"
           type="submit"
+          disabled={isLoading || !url}
         >
-          Send
+          {isLoading ? "Sending..." : "Send Request"}
         </button>
       </div>
     </form>

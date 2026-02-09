@@ -3,6 +3,8 @@ import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import fs from "fs";
+import path from "path";
 dotenv.config();
 import authRoutes from "./authroutes";
 import RequestHistory from "./requestHistory";
@@ -13,9 +15,13 @@ const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
-    origin: ["https://postman-clone-seven.vercel.app"],
+    origin: [
+      "https://postman-clone-seven.vercel.app",
+      "http://localhost:5173",
+      "http://127.0.0.1:5173",
+    ],
     methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
-  })
+  }),
 );
 
 app.use(express.json());
@@ -307,7 +313,7 @@ app.get("/api/stats", authenticateJWT, async (req, res) => {
         acc[method] = (acc[method] || 0) + 1;
         return acc;
       },
-      {}
+      {},
     );
 
     const statusCounts = stats[0].statusBreakdown.reduce(
@@ -315,7 +321,7 @@ app.get("/api/stats", authenticateJWT, async (req, res) => {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {}
+      {},
     );
 
     res.json({
@@ -330,6 +336,24 @@ app.get("/api/stats", authenticateJWT, async (req, res) => {
       details: error.message,
     });
   }
+});
+
+const clientDistPath = path.resolve(__dirname, "../../client/dist");
+app.use(express.static(clientDistPath));
+app.get(/.*/, (req, res) => {
+  if (req.path.startsWith("/api")) {
+    res.status(404).json({ error: "Not found" });
+    return;
+  }
+  const indexPath = path.join(clientDistPath, "index.html");
+  if (!fs.existsSync(indexPath)) {
+    res.status(404).json({
+      error: "Frontend not built",
+      hint: "Run npm run build in the client folder",
+    });
+    return;
+  }
+  res.sendFile(indexPath);
 });
 
 export default app;

@@ -1,29 +1,48 @@
 {
   "name": "backend",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-"scripts": {
-  "dev": "nodemon src/index.ts",     
-  "build": "tsc",                    
-  "start": "node dist/index.js"     
-},
-  "keywords": [],
+  "version": "2.0.0",
+  "description": "Production-grade Postman Clone API",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "scripts": {
+    "dev": "nodemon src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:dev": "ts-node src/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "api",
+    "postman",
+    "rest-client"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "cros": "^1.1.0",
     "dotenv": "^16.5.0",
+    "dotenv-safe": "^9.1.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.16.0"
+    "mongoose": "^8.16.0",
+    "morgan": "^1.10.1",
+    "winston": "^3.19.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^24.0.3",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",

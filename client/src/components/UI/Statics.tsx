@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import { RxCross2 } from "react-icons/rx";
 import { FaCheck } from "react-icons/fa";
+import config from "../../config/config";
 
 interface Statistics {
   totalRequests: number;
@@ -22,14 +23,11 @@ const Statistics: React.FC = () => {
 
     setLoading(true);
     try {
-      const response = await fetch(
-        "https://postman-clone-ci4y.onrender.com/api/stats",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${config.API_URL}/api/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (response.ok) {
         const data = await response.json();
@@ -202,7 +200,7 @@ const Statistics: React.FC = () => {
                 <div className="flex items-center flex-1">
                   <span
                     className={`inline-block w-3 h-3 rounded-full mr-3 ${getMethodColor(
-                      method
+                      method,
                     )}`}
                   ></span>
                   <span className="text-sm font-medium text-gray-700 w-16">
@@ -236,7 +234,7 @@ const Statistics: React.FC = () => {
                 <div className="flex items-center flex-1">
                   <span
                     className={`inline-block w-3 h-3 rounded-full mr-3 ${getStatusColor(
-                      status
+                      status,
                     )}`}
                   ></span>
                   <span className="text-sm font-medium text-gray-700 w-16">

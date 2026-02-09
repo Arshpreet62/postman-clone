@@ -28,8 +28,21 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
   if (!request || !response) return null;
 
   const formattedHeaders = Object.entries(response.headers).map(
-    ([key, value]) => `${key}: ${value}`
+    ([key, value]) => `${key}: ${value}`,
   );
+
+  const formatBody = (body: any) => {
+    if (body === null || body === undefined) return "";
+    if (typeof body === "string") {
+      try {
+        const parsed = JSON.parse(body);
+        return JSON.stringify(parsed, null, 2);
+      } catch {
+        return body;
+      }
+    }
+    return JSON.stringify(body, null, 2);
+  };
 
   const generatedFetchCode = () => {
     const method = request.method;
@@ -95,7 +108,7 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
         </div>
 
         {/* Headers */}
-        {!response.headers === undefined && (
+        {response.headers && (
           <>
             <h3 className="mt-4 font-semibold">Headers</h3>
             <pre className="bg-gray-700 p-3 rounded-md overflow-auto text-sm">
@@ -107,7 +120,7 @@ const ResponseShowcase: React.FC<Props> = ({ request, response }) => {
         {/* Body */}
         <h3 className="mt-4 font-semibold">Body</h3>
         <pre className="bg-gray-700 p-3 max-h-100 rounded-md overflow-auto text-sm">
-          {JSON.stringify(response.body, null, 2)}
+          {formatBody(response.body)}
         </pre>
       </div>
     </div>

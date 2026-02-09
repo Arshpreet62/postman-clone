@@ -15,7 +15,7 @@ export default function Landing() {
         try {
           const parsedUser = JSON.parse(userData);
           setUser(parsedUser);
-          setLocation("/Dashboard");
+          setLocation("/dashboard");
         } catch (error) {
           console.error("Failed to parse user data:", error);
           localStorage.removeItem("user");
@@ -37,7 +37,7 @@ export default function Landing() {
         simplicity.
       </p>
       <div className="flex flex-col sm:flex-row gap-4">
-        <Link href="/Signup">
+        <Link href="/signup">
           <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl shadow-lg transition-all duration-200">
             Sign Up / Log In
           </button>

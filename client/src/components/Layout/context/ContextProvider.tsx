@@ -5,6 +5,7 @@ import {
   type User,
   type ResponseData,
 } from "./Context";
+import { apiService } from "../../../services/api";
 
 interface Props {
   children: React.ReactNode;
@@ -17,50 +18,69 @@ export const ContextProvider = ({ children }: Props) => {
   const [responseData, setResponseData] = useState<ResponseData | null>(null);
 
   useEffect(() => {
-    const stored = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
-    const parsedUser = user ? JSON.parse(user) : null;
-    if (stored && parsedUser !== "null") {
-      setToken(stored);
-      setUser(parsedUser);
-      fetchUser(stored);
-    } else {
-      setLoading(false);
-    }
+    const initAuth = () => {
+      const stored = localStorage.getItem("token");
+      const userData = localStorage.getItem("user");
+
+      if (stored && userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          if (parsedUser && parsedUser.email) {
+            setToken(stored);
+            setUser(parsedUser);
+            fetchUser();
+          } else {
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error("Failed to parse user data:", error);
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
   }, []);
 
-  const fetchUser = async (token: string) => {
+  const fetchUser = async () => {
     try {
-      const res = await fetch(
-        "https://postman-clone-ci4y.onrender.com/api/auth/profile",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const data = await apiService.get<{ success: boolean; user: User }>(
+        "/api/auth/profile",
       );
-      const data = await res.json();
-      if (res.ok) {
+      if (data.success && data.user) {
         setUser(data.user);
       } else {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        setUser(null);
+        setToken(null);
       }
-    } catch {
+    } catch (error) {
+      console.error("Failed to fetch user:", error);
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
+      setToken(null);
     } finally {
       setLoading(false);
     }
   };
 
   const login = async (email: string, password: string) => {
-    const res = await fetch(
-      "https://postman-clone-ci4y.onrender.com/api/auth/login",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      }
-    );
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Login failed");
+    const data = await apiService.post<{
+      success: boolean;
+      token: string;
+      user: User;
+      error?: string;
+    }>("/api/auth/login", { email, password });
+
+    if (!data.success || !data.token) {
+      throw new Error(data.error || "Login failed");
+    }
 
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
@@ -69,16 +89,16 @@ export const ContextProvider = ({ children }: Props) => {
   };
 
   const signup = async (email: string, password: string) => {
-    const res = await fetch(
-      "https://postman-clone-ci4y.onrender.com/api/auth/signup",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      }
-    );
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Signup failed");
+    const data = await apiService.post<{
+      success: boolean;
+      token: string;
+      user: User;
+      error?: string;
+    }>("/api/auth/signup", { email, password });
+
+    if (!data.success || !data.token) {
+      throw new Error(data.error || "Signup failed");
+    }
 
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
@@ -89,7 +109,9 @@ export const ContextProvider = ({ children }: Props) => {
   const logout = () => {
     setUser(null);
     setToken(null);
+    setResponseData(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
 
   const value: ContextType = {
