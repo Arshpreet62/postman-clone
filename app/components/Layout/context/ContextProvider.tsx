@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import {
   GlobalContext,
@@ -19,8 +21,8 @@ export const ContextProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const stored = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
-    const parsedUser = user ? JSON.parse(user) : null;
+    const userStr = localStorage.getItem("user");
+    const parsedUser = userStr ? JSON.parse(userStr) : null;
     if (stored && parsedUser !== "null") {
       setToken(stored);
       setUser(parsedUser);

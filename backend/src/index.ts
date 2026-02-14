@@ -11,12 +11,30 @@ import { authenticateJWT } from "./authMiddleware";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(
-  cors({
-    origin: ["https://postman-clone-seven.vercel.app"],
-    methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
-  })
-);
+const defaultOrigins = [
+  "https://postman-clone-seven.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
+const envOrigins = (process.env.CORS_ORIGIN || "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+const allowedOrigins = envOrigins.length > 0 ? envOrigins : defaultOrigins;
+
+const corsOptions: cors.CorsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use(express.json());
 
@@ -307,7 +325,7 @@ app.get("/api/stats", authenticateJWT, async (req, res) => {
         acc[method] = (acc[method] || 0) + 1;
         return acc;
       },
-      {}
+      {},
     );
 
     const statusCounts = stats[0].statusBreakdown.reduce(
@@ -315,7 +333,7 @@ app.get("/api/stats", authenticateJWT, async (req, res) => {
         acc[status] = (acc[status] || 0) + 1;
         return acc;
       },
-      {}
+      {},
     );
 
     res.json({

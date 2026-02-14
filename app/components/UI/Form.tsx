@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import { apiUrl } from "../../config/api";
@@ -16,6 +18,7 @@ export default function Form() {
   const [headersValue, setHeadersValue] = useState("");
   const [urlerror, setUrlerror] = useState("");
   const [requestError, setRequestError] = useState("");
+
   const addMoreHeaders = () => {
     setHeaders([...headers, { key: headersKey, value: headersValue }]);
     setHeadersKey("");
@@ -43,22 +46,20 @@ export default function Form() {
     if (!check && method !== "GET") {
       finalHeaders.push({ key: "Content-Type", value: "application/json" });
     }
-    console.log(finalHeaders);
 
     try {
       const response = await fetch(apiUrl("/api/request"), {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            url,
-            method,
-            headers: finalHeaders,
-            body,
-          }),
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({
+          url,
+          method,
+          headers: finalHeaders,
+          body,
+        }),
       });
 
       const result = await response.json();
@@ -89,12 +90,13 @@ export default function Form() {
       setRequestError("Failed to send request. Please try again.");
     }
   };
+
   return (
     <form
       className="flex w-100 justify-center items-center bg-white shadow-lg p-4 rounded-lg"
       onSubmit={handleSubmit}
     >
-      <div className="flex  flex-col gap-3 rounded-md justify-center border-2 border-black/30  h-full w-full px-3 py-2 relative">
+      <div className="flex flex-col gap-3 rounded-md justify-center border-2 border-black/30 h-full w-full px-3 py-2 relative">
         {requestError.length > 0 && (
           <div className="flex w-full h-full flex-col gap-3 items-center justify-center absolute top-0 right-0 bg-white z-10">
             <p className="text-center font-medium text-red-500 text-3xl">
@@ -109,8 +111,8 @@ export default function Form() {
             </button>
           </div>
         )}
-        <div className="flex  gap-1 justify-between items-center w-full">
-          <h3 className=" flex items-center gap-2 text-nowrap text-xl font-bold text-blue-600/90">
+        <div className="flex gap-1 justify-between items-center w-full">
+          <h3 className="flex items-center gap-2 text-nowrap text-xl font-bold text-blue-600/90">
             URL
             <span>
               <svg
@@ -132,7 +134,7 @@ export default function Form() {
           <input
             type="text"
             value={url}
-            className="w-60 rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-60 rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="enter your url"
             onChange={(e) => setUrl(e.target.value)}
           />
@@ -147,7 +149,7 @@ export default function Form() {
             name="method"
             id="method"
             value={method}
-            className="px-2 py-2 w-60 border-2  border-black/30 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-2 py-2 w-60 border-2 border-black/30 rounded-md bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
             onChange={(e) => setMethod(e.target.value)}
           >
             <option value="GET">GET</option>
@@ -167,14 +169,14 @@ export default function Form() {
                 type="text"
                 placeholder="key"
                 value={headersKey}
-                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={(e) => setHeadersKey(e.target.value)}
               />
               <input
                 type="text"
                 placeholder="value"
                 value={headersValue}
-                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onChange={(e) => setHeadersValue(e.target.value)}
               />
             </div>
@@ -192,26 +194,19 @@ export default function Form() {
                   key={index}
                   className="flex w-full h-10 items-center justify-between gap-2"
                 >
-                  {/* Header Key */}
                   <div
                     className="w-[35%] h-full flex items-center px-2 text-start border-2 border-black/30 rounded-md overflow-x-auto whitespace-nowrap hide-scrollbar"
                     title={header.key}
                   >
                     {header.key}
                   </div>
-
-                  {/* Colon */}
                   <span className="text-xl">:</span>
-
-                  {/* Header Value */}
                   <div
                     className="w-[35%] h-full flex items-center px-2 text-start border-2 border-black/30 rounded-md overflow-x-auto whitespace-nowrap hide-scrollbar"
                     title={header.value}
                   >
                     {header.value}
                   </div>
-
-                  {/* Delete Button */}
                   <button
                     type="button"
                     className="px-3 py-1 rounded-md bg-red-500 hover:bg-red-600 text-white font-semibold transition"
@@ -229,7 +224,7 @@ export default function Form() {
             </h3>
             <textarea
               placeholder="enter your body"
-              className="w-full h-40  rounded-md border-2 border-black/30 p-2 overflow-auto  bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full h-40 rounded-md border-2 border-black/30 p-2 overflow-auto bg-white text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
               value={body}
               onChange={(e) => setBody(e.target.value)}
             />

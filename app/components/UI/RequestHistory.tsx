@@ -1,23 +1,25 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import ResponseShowcase from "./ResponseDisplay";
 import { apiUrl } from "../../config/api";
 
 interface RequestHistoryItem {
-  _id: string; // MongoDB document ID as a string
-  user: string; // the userId field you store
-  endpoint: string; // the URL or endpoint
-  method: string; // HTTP method (GET, POST, etc.)
-  timestamp: string; // ISO string date (from new Date())
+  _id: string;
+  user: string;
+  endpoint: string;
+  method: string;
+  timestamp: string;
   request: {
-    headers: Record<string, string | string[]>; // headers can be strings or arrays of strings
-    body?: any; // request body can be any type (optional)
+    headers: Record<string, string | string[]>;
+    body?: any;
   };
   response: {
-    status: number; // HTTP status code, e.g. 500
-    statusText: string; // status text, e.g. "Request Failed"
-    headers: Record<string, string | string[]>; // response headers, same format as request headers
-    body?: any; // response body (error object or anything else)
+    status: number;
+    statusText: string;
+    headers: Record<string, string | string[]>;
+    body?: any;
   };
 }
 
@@ -28,9 +30,8 @@ interface Pagination {
   limit: number;
 }
 
-// Helper to normalize headers: convert string[] to comma-joined strings
 const normalizeHeaders = (
-  headers: Record<string, string | string[]>
+  headers: Record<string, string | string[]>,
 ): Record<string, string> => {
   const normalized: Record<string, string> = {};
   Object.entries(headers).forEach(([key, value]) => {
@@ -58,7 +59,7 @@ const RequestHistory: React.FC = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -78,17 +79,13 @@ const RequestHistory: React.FC = () => {
   const deleteRequest = async (requestId: string) => {
     if (!token) return;
     try {
-      const response = await fetch(
-        apiUrl(`/api/history/${requestId}`),
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(apiUrl(`/api/history/${requestId}`), {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.ok) {
-        // Refresh current page after deletion
         fetchHistory(currentPage);
         setSelectedRequest(null);
       } else {
@@ -105,10 +102,9 @@ const RequestHistory: React.FC = () => {
 
     try {
       const response = await fetch(apiUrl("/api/history"), {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       });
       if (response.ok) {
@@ -123,7 +119,6 @@ const RequestHistory: React.FC = () => {
     }
   };
 
-  // Return color classes for status codes
   const getStatusColor = (status: number) => {
     if (status >= 200 && status < 300) return "text-green-600";
     if (status >= 400 && status < 500) return "text-yellow-600";
@@ -131,7 +126,6 @@ const RequestHistory: React.FC = () => {
     return "text-gray-600";
   };
 
-  // Return color classes for HTTP methods
   const getMethodColor = (method: string) => {
     switch (method) {
       case "GET":
@@ -147,7 +141,6 @@ const RequestHistory: React.FC = () => {
     }
   };
 
-  // Fetch history on page or token change
   useEffect(() => {
     fetchHistory(currentPage);
   }, [currentPage, token]);
@@ -192,7 +185,7 @@ const RequestHistory: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <span
                     className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getMethodColor(
-                      req.method
+                      req.method,
                     )}`}
                   >
                     {req.method}
@@ -209,7 +202,7 @@ const RequestHistory: React.FC = () => {
                 <div className="flex items-center space-x-4">
                   <span
                     className={`text-sm font-medium ${getStatusColor(
-                      req.response.status
+                      req.response.status,
                     )}`}
                   >
                     {req.response.status}
@@ -231,7 +224,6 @@ const RequestHistory: React.FC = () => {
             ))}
           </ul>
 
-          {/* Pagination Controls */}
           {pagination && pagination.totalPages > 1 && (
             <div className="flex justify-center space-x-2 mt-4">
               <button
@@ -258,7 +250,6 @@ const RequestHistory: React.FC = () => {
         </>
       )}
 
-      {/* Details Modal */}
       {selectedRequest && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-2/3 shadow-lg rounded-md bg-white max-h-[90vh] overflow-y-auto">

@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import { useGlobal } from "../Layout/context/Context";
 import { RxCross2 } from "react-icons/rx";
@@ -24,9 +26,8 @@ const Statistics: React.FC = () => {
     setLoading(true);
     try {
       const response = await fetch(apiUrl("/api/stats"), {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -93,7 +94,6 @@ const Statistics: React.FC = () => {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-900">Request Statistics</h2>
 
-      {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <div className="bg-white overflow-hidden shadow rounded-lg">
           <div className="p-5">
@@ -179,7 +179,7 @@ const Statistics: React.FC = () => {
                     Success Rate
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
-                    {stats.successRate.toFixed(1)}%
+                    {(stats.successRate as any).toFixed(1)}%
                   </dd>
                 </dl>
               </div>
@@ -188,9 +188,7 @@ const Statistics: React.FC = () => {
         </div>
       </div>
 
-      {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Method Breakdown */}
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             Requests by Method
@@ -201,7 +199,7 @@ const Statistics: React.FC = () => {
                 <div className="flex items-center flex-1">
                   <span
                     className={`inline-block w-3 h-3 rounded-full mr-3 ${getMethodColor(
-                      method
+                      method,
                     )}`}
                   ></span>
                   <span className="text-sm font-medium text-gray-700 w-16">
@@ -224,7 +222,6 @@ const Statistics: React.FC = () => {
           </div>
         </div>
 
-        {/* Status Breakdown */}
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium text-gray-900 mb-4">
             Requests by Status Code
@@ -235,7 +232,7 @@ const Statistics: React.FC = () => {
                 <div className="flex items-center flex-1">
                   <span
                     className={`inline-block w-3 h-3 rounded-full mr-3 ${getStatusColor(
-                      status
+                      status,
                     )}`}
                   ></span>
                   <span className="text-sm font-medium text-gray-700 w-16">
@@ -259,7 +256,6 @@ const Statistics: React.FC = () => {
         </div>
       </div>
 
-      {/* Success Rate Visualization */}
       <div className="bg-white shadow rounded-lg p-6">
         <h3 className="text-lg font-medium text-gray-900 mb-4">
           Success Rate Overview
@@ -269,10 +265,12 @@ const Statistics: React.FC = () => {
             <div className="bg-gray-200 rounded-full h-4">
               <div
                 className="bg-green-500 h-4 rounded-full flex items-center justify-end pr-2"
-                style={{ width: `${stats.successRate}%` }}
+                style={{
+                  width: `${(stats.successRate as any).toFixed(1)}%`,
+                }}
               >
                 <span className="text-xs text-white font-medium">
-                  {stats.successRate.toFixed(1)}%
+                  {(stats.successRate as any).toFixed(1)}%
                 </span>
               </div>
             </div>
@@ -283,7 +281,6 @@ const Statistics: React.FC = () => {
         </div>
       </div>
 
-      {/* Refresh Button */}
       <div className="flex justify-center">
         <button
           onClick={fetchStatistics}
