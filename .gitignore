@@ -1,4 +1,14 @@
 node_modules
-.env
-dist
+../.env
+.next/
+node_modules/
+.env*.local
+dist/
+build/
+*.log
+.DS_Store
+.idea/
+.vscode/
+coverage/
+
 *.log
