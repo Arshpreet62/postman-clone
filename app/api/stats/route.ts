@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     const failedRequests = totalRequests - successfulRequests;
     const successRate =
       totalRequests > 0
-        ? ((successfulRequests / totalRequests) * 100).toFixed(2)
+        ? Number(((successfulRequests / totalRequests) * 100).toFixed(2))
         : 0;
 
     const methodBreakdown: Record<string, number> = {};
